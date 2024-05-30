@@ -1,8 +1,25 @@
+import { Theme } from "controls/theme.slint";
+import { GridView } from "controls/grid_view.slint";
+import { TimeZoneInfo } from "controls/timezone_info.slint";
+import { Header } from "header.slint";
 
 export component AppWindow inherits Window {
     title: "tymoz";
     preferred-width: 1200px;
     preferred-height: 800px;
-    min-width: 560px;
+    min-width: 620px;
     min-height: 720px;
+
+    background: Theme.appBackgroundColor;
+
+    VerticalLayout {
+        spacing: 5px;
+        padding: 10px;
+
+        Header { }
+
+        Rectangle {
+            vertical-stretch: 1;
+        }
+    }
 }

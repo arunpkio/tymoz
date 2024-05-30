@@ -1,0 +1,35 @@
+import { Card } from "controls/card.slint";
+import { LabelLarge, LabelMedium } from "controls/labels.slint";
+import { Theme } from "controls/theme.slint";
+import { IconButton } from "controls/icon_button.slint";
+import { ThemeButton } from "controls/theme_button.slint";
+import { TimeFormatToggle } from "controls/time_format_toggle.slint";
+
+export component Header inherits Card {
+    height: 60px;
+    preferred-width: 300px;
+
+    HorizontalLayout {
+        y: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+        spacing: 10px;
+
+        date_time_label:= LabelMedium {
+            text: "Day, Month Date | HH:MM:SS";
+            y: 9px; // FIXME: How to align the Label vertically inside a HorizontalLayout?
+        }
+
+        Rectangle {
+            horizontal-stretch: 1;
+        }
+
+        IconButton {
+            icon: @image-url("icons/add.svg");
+        }
+
+        TimeFormatToggle { }
+
+        ThemeButton { }
+    }
+}
