@@ -1,0 +1,17 @@
+import { Theme } from "theme.slint";
+import { LabelSmall } from "labels.slint";
+
+export component GmtOffset inherits Rectangle {
+    in property <string> offset;
+    in property <bool> is_ahead;
+
+     background: is_ahead ? Theme.offsetAheadLabelBackgroundColor : Theme.offsetBehindLabelBackgroundColor;
+     height: txt.height + 8px;
+     width: txt.width + 16px;
+     border-radius: 6px;
+
+     txt := LabelSmall {
+         text: offset == "GMT" ? offset : offset + "H";
+         color: is_ahead ? Theme.offsetAheadLabelTextColor : Theme.offsetBehindLabelTextColor;
+     }
+ }

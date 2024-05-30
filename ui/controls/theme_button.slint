@@ -1,0 +1,11 @@
+import { Theme } from "theme.slint";
+import { IconButton } from "icon_button.slint";
+
+export component ThemeButton inherits IconButton {
+    icon: Theme.darkTheme ? @image-url("../icons/sun.svg"): @image-url("../icons/moon.svg");
+    checked: Theme.darkTheme;
+
+    clicked => {
+        Theme.darkTheme = !self.checked;
+    }
+}

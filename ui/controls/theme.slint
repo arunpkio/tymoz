@@ -1,0 +1,22 @@
+export global Theme {
+    in-out property <bool> darkTheme: true;
+
+    in-out property<color> appBackgroundColor: darkTheme ? #111214 : #F5F5ED;
+    in-out property<color> cardBackgroundColor: darkTheme ? #191A1C : #EFEFEF;
+    in-out property<color> cardBorderColor: darkTheme ? #2B2C30 : #D3D3E0;
+
+    in-out property<color> labelTextColor: darkTheme ? #fefefe : #101010;
+    in-out property<length> labelFontSizeSmall: 9pt;
+    in-out property<length> labelFontSizeMedium: 14pt;
+    in-out property<length> labelFontSizeLarge: 26pt;
+
+    in-out property<color> offsetAheadLabelBackgroundColor: darkTheme ? #18241E : #B2D8B2;
+    in-out property<color> offsetBehindLabelBackgroundColor: darkTheme ? #271C19 : #F7B7AD;
+    in-out property<color> offsetAheadLabelTextColor: darkTheme ? #20C275 : #006400;
+    in-out property<color> offsetBehindLabelTextColor: darkTheme ? #EC4F2C : #B22222;
+
+    in-out property<color> iconButtonBorderColor: darkTheme ? #2B2C30 : #D3D3E0;
+    in-out property<color> iconButtonImageOverlayColor: darkTheme ? #fefefe : #101010;
+
+    in-out property<color> formatToggleBorderColor: darkTheme ? #2B2C30 : #D3D3E0;
+}

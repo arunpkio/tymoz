@@ -1,0 +1,68 @@
+import { Card } from "card.slint";
+import { GmtOffset } from "gmt_offset.slint";
+import { LabelSmall, LabelMedium, LabelLarge } from "labels.slint";
+import { Theme } from "theme.slint";
+
+export component TimeZoneInfo inherits Rectangle {
+    width: 320px;
+    height: 180px;
+
+    in property <string> city;
+    in property <string> time_now;
+    in property <string> offset;
+    in property <string> date;
+    in property <string> timezone;
+    in property <bool> is_ahead;
+
+    Card {
+        width: parent.width - 20px;
+        height: parent.height - 20px;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+
+        VerticalLayout {
+            spacing: 5px;
+            Rectangle {
+                width: parent.width;
+                height: 40px;
+                LabelMedium {
+                    x: 10px;
+                    text: root.city;
+                }
+
+                Rectangle {
+                    height: 1px;
+                    width: parent.width;
+                    y: 40px;
+                    background: Theme.cardBorderColor;
+                }
+            }
+
+            LabelLarge {
+                text: root.time_now;
+                x: 10px;
+            }
+
+            GmtOffset {
+                x: 10px;
+                offset: root.offset;
+                is_ahead: root.is_ahead;
+            }
+
+            LabelSmall {
+                text: timezone;
+                vertical-alignment: center;
+                x: 10px;
+            }
+
+            Rectangle {
+                vertical-stretch: 1;
+            }
+        }
+
+        LabelMedium {
+            text: root.date;
+            x: parent.width - self.width - 10px;
+        }
+    }
+}

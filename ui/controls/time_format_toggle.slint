@@ -1,0 +1,58 @@
+import { Theme } from "theme.slint";
+import { LabelSmall } from "labels.slint";
+
+component ContentLabel inherits Rectangle {
+    in-out property <string> text <=> label.text;
+    width: 40px;
+    label:= LabelSmall {}
+}
+
+export component TimeFormatToggle inherits Rectangle {
+    in-out property <string> text;
+    in-out property <bool> checked;
+
+    callback toggled;
+
+    height: 40px;
+    width: 80px;
+
+    HorizontalLayout {
+        spacing: 0px;
+        container := Rectangle {
+            width: 80px;
+            border-width: touch.has-hover ? 1.5px : 1px;
+            border-radius: 12px;
+            border-color: Theme.formatToggleBorderColor;
+
+            Rectangle {
+                width: root.height - 8px;
+                height: self.width;
+                background: Theme.formatToggleBorderColor;
+                border-radius: 10px;
+                y: 4px;
+                x: 4px + self.a * (container.width - self.width - 8px);
+                property <float> a: root.checked ? 1 : 0;
+                animate a { duration: 200ms; easing: ease;}
+            }
+
+            HorizontalLayout {
+                ContentLabel {
+                    height: parent.height;
+                    text: "24h";
+                }
+
+                ContentLabel {
+                    height: parent.height;
+                    text: "12h";
+                }
+            }
+        }
+    }
+
+    touch := TouchArea {
+        clicked => {
+            root.checked = !root.checked;
+            root.toggled();
+        }
+    }
+}
