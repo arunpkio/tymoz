@@ -1,0 +1,20 @@
+import { ScrollView} from "std-widgets.slint";
+
+export component GridView inherits ScrollView {
+    horizontal-stretch: 1;
+    vertical-stretch: 1;
+    viewport-height: 200px; // to be set from outside like Math.round(your_model.length / columns) * preferredCellHeight;
+    viewport-width: 1000px; // to be set from outside as this.parent.width;
+
+    in property <int> columns: Math.max(1,Math.min(maximumColumns,
+    			 Math.floor(self.width / 1px / minimumColumnWidth),
+    			 Math.ceil(self.width / 1px / maximumColumnWidth)));
+
+    in property <int> maximumColumns: 5;
+    in property <int> maximumColumnWidth: 400;
+    in property <int> minimumColumnWidth: 350;
+
+    in property <int> preferredCellHeight: 180;
+    in property <int> preferredCellWidth: 300;
+    in property <int> expectedWidth: (self.width / 1px) / columns;
+}
