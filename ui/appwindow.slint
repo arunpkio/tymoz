@@ -2,6 +2,9 @@ import { Theme } from "controls/theme.slint";
 import { GridView } from "controls/grid_view.slint";
 import { TimeZoneInfo } from "controls/timezone_info.slint";
 import { Header } from "header.slint";
+import { DataAdapter } from "data_adapter.slint";
+
+export { DataAdapter }
 
 export component AppWindow inherits Window {
     title: "tymoz";
@@ -9,14 +12,15 @@ export component AppWindow inherits Window {
     preferred-height: 800px;
     min-width: 620px;
     min-height: 720px;
-
     background: Theme.appBackgroundColor;
 
     VerticalLayout {
         spacing: 5px;
         padding: 10px;
 
-        Header { }
+        Header {
+            date_time <=> DataAdapter.date_time;
+         }
 
         Rectangle {
             vertical-stretch: 1;

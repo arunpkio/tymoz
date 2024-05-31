@@ -4,10 +4,13 @@ import { Theme } from "controls/theme.slint";
 import { IconButton } from "controls/icon_button.slint";
 import { ThemeButton } from "controls/theme_button.slint";
 import { TimeFormatToggle } from "controls/time_format_toggle.slint";
+import { DataAdapter } from "data_adapter.slint";
 
 export component Header inherits Card {
     height: 60px;
     preferred-width: 300px;
+
+    in property <string> date_time <=> date_time_label.text;
 
     HorizontalLayout {
         y: 10px;
@@ -28,7 +31,9 @@ export component Header inherits Card {
             icon: @image-url("icons/add.svg");
         }
 
-        TimeFormatToggle { }
+        TimeFormatToggle {
+            checked <=> DataAdapter.use_12h_format;
+         }
 
         ThemeButton { }
     }
