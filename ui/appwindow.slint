@@ -2,7 +2,8 @@ import { Theme } from "controls/theme.slint";
 import { GridView } from "controls/grid_view.slint";
 import { TimeZoneInfo } from "controls/timezone_info.slint";
 import { Header } from "header.slint";
-import { DataAdapter } from "data_adapter.slint";
+import { TimeZoneInfo, DataAdapter } from "data_adapter.slint";
+import { CityListPopup } from "city_list_popup.slint";
 
 export { DataAdapter }
 
@@ -20,10 +21,19 @@ export component AppWindow inherits Window {
 
         Header {
             date_time <=> DataAdapter.date_time;
+            add_clicked => {
+                popup.visible = true;
+            }
          }
 
         Rectangle {
             vertical-stretch: 1;
         }
+    }
+
+    popup:= CityListPopup {
+        width: parent.width;
+        height: parent.height;
+        visible: false;
     }
 }

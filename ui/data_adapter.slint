@@ -1,5 +1,15 @@
 
+export struct TimeZoneInfo  {
+    city: string,
+	timenow: string,
+	offset: string,
+	date: string,
+	is_ahead: bool,
+	timezone: string
+}
+
 export global DataAdapter {
     in property <string> date_time: "";
     in-out property <bool> use_12h_format: false;
+    in property <[TimeZoneInfo]> available_cities_model: [];
 }

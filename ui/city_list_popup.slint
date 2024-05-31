@@ -1,0 +1,107 @@
+import { ListView } from "std-widgets.slint";
+import { Theme } from "controls/theme.slint";
+import { LabelMediumSmall } from "controls/labels.slint";
+import { TimeZoneInfo, DataAdapter } from "data_adapter.slint";
+
+export component CityListPopup inherits Rectangle {
+    width: 500px;
+    height: 400px;
+    background: Theme.popUpBackgroundDimColor;
+
+    callback add_city(int);
+
+    TouchArea {
+        clicked => {
+            root.visible = false;
+        }
+    }
+
+    child := Rectangle {
+        width: 480px;
+        height: 360px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        z: 100;
+        clip: true;
+
+        background: Theme.popUpBackgroundColor;
+        border-color: Theme.popUpBorderColor;
+        border-radius: 10px;
+        border-width: 1px;
+
+        // to block clicks going to the TouchArea underneath
+        TouchArea { }
+
+        VerticalLayout {
+            height: 100%;
+            HorizontalLayout {
+                horizontal-stretch: 1;
+
+                Rectangle {
+                    horizontal-stretch: 1;
+                    height: 40px;
+                    background: transparent;
+                    LabelMediumSmall {
+                        text: "Select city";
+                        x: 20px;
+                        y: 12px;
+                    }
+
+                    Rectangle {
+                        width: parent.width;
+                        height: 1px;
+                        y: parent.height;
+                        background: Theme.lineColor;
+                    }
+
+                    Image {
+                        source: @image-url("icons/close.svg");
+                        colorize: Theme.iconButtonImageOverlayColor;
+                        width: 24px;
+                        height: 24px;
+                        x: parent.width - self.width - 10px;
+                        opacity: close_touch.pressed ? 0.7 : 1.0;
+
+                        close_touch := TouchArea {
+                            clicked => {
+                                root.visible = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            listview := ListView {
+                vertical-stretch: 1;
+                horizontal-stretch: 1;
+                padding: 10px;
+
+                for tz[index] in DataAdapter.available_cities_model: Rectangle {
+                    height: 52px;
+                    width: parent.width;
+                    Rectangle {
+                        width: parent.width - 20px;
+                        x: 10px;
+                        height: 40px;
+                        y: 6px;
+                        background: touch.has-hover ? Theme.cardBackgroundColor : transparent;
+                        border-radius: 5px;
+                        border-width: 1px;
+                    }
+
+                    LabelMediumSmall {
+                        text: tz.city;
+                        x: 20px;
+                    }
+
+                    touch := TouchArea {
+                        clicked => {
+                            root.add_city(index);
+                            root.visible = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

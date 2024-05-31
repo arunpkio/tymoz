@@ -11,6 +11,7 @@ export component Header inherits Card {
     preferred-width: 300px;
 
     in property <string> date_time <=> date_time_label.text;
+    callback add_clicked <=> add_button.clicked;
 
     HorizontalLayout {
         y: 10px;
@@ -27,7 +28,7 @@ export component Header inherits Card {
             horizontal-stretch: 1;
         }
 
-        IconButton {
+        add_button:= IconButton {
             icon: @image-url("icons/add.svg");
         }
 
