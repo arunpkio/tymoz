@@ -24,16 +24,38 @@ export component AppWindow inherits Window {
             add_clicked => {
                 popup.visible = true;
             }
-         }
+        }
 
         Rectangle {
             vertical-stretch: 1;
+
+            view := GridView {
+                viewport-height: Math.round(DataAdapter.selected_cities_model.length / self.columns) * 180px;
+                viewport-width: parent.width;
+
+                for tz[index] in DataAdapter.selected_cities_model: TimeZoneInfo {
+                    width: view.expectedWidth * 1px;
+                    height: view.preferredCellHeight * 1px;
+                    x: (Math.mod(index, view.columns)) * self.width ;
+                    y: Math.floor(index / view.columns) * self.height;
+                    city: tz.city;
+                    time_now: tz.timenow;
+                    offset: tz.offset;
+                    date: tz.date;
+                    is_ahead: tz.is-ahead;
+                    timezone: tz.timezone;
+                }
+            }
         }
     }
 
-    popup:= CityListPopup {
+    popup := CityListPopup {
         width: parent.width;
         height: parent.height;
         visible: false;
+
+        add_city(index) => {
+            DataAdapter.add_city(index);
+        }
     }
 }

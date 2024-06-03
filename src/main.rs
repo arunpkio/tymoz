@@ -1,10 +1,12 @@
 slint::include_modules!();
 mod time_zones;
-use time_zones::TIME_ZONES;
+use chrono::{Local, Offset, Utc};
+use chrono_tz::Tz;
+use slint::{Model, Timer, TimerMode, VecModel};
 use std::cell::RefCell;
 use std::rc::Rc;
-use chrono::{Local, Offset, Utc};
-use slint::{Timer, TimerMode};
+use std::str::FromStr;
+use time_zones::TIME_ZONES;
 
 fn format_time_diff(value: f64) -> String {
     match value {
@@ -15,7 +17,10 @@ fn format_time_diff(value: f64) -> String {
 }
 
 struct AppState {
-    available_cities_model: Rc<slint::VecModel<TimeZoneInfo>>,
+    available_cities_model: Rc<VecModel<TimeZoneInfo>>,
+    selected_cities_model: Rc<VecModel<TimeZoneInfo>>,
+
+    timer: Timer,
 }
 
 impl AppState {
@@ -29,13 +34,30 @@ impl AppState {
 
             self.available_cities_model.push(TimeZoneInfo {
                 city: zone.name.to_string().into(),
-                timenow: time_str.into(),
+                timenow: time_str.clone().into(),
                 offset: format_time_diff(local_offset).into(),
-                date: timezone_date.into(),
+                date: timezone_date.clone().into(),
                 is_ahead: local_offset >= 0.0,
                 timezone: zone.timezone.to_string().into(),
             });
         }
+
+        let utc_now: chrono::prelude::DateTime<Utc> = Utc::now();
+        let local_time_str: String = utc_now.format("%H:%M").to_string();
+        let local_offset: f64 = utc_now.offset().fix().local_minus_utc() as f64 / 3600.0;
+        let utc_date = utc_now.format("%d, %B").to_string();
+        let utc_zone_info = &TIME_ZONES[0]; // By default, show UTC time
+        self.selected_cities_model.insert(
+            0,
+            TimeZoneInfo {
+                city: utc_zone_info.name.into(),
+                timenow: local_time_str.into(),
+                offset: format_time_diff(local_offset).into(),
+                date: utc_date.into(),
+                is_ahead: local_offset >= 0.0,
+                timezone: utc_zone_info.location.into(),
+            },
+        );
     }
 }
 
@@ -67,17 +89,61 @@ pub fn update(window: &AppWindow) -> Timer {
 }
 
 fn main() -> Result<(), slint::PlatformError> {
-
     let app_window = AppWindow::new().unwrap();
 
     let app_state = Rc::new(RefCell::new(AppState {
         available_cities_model: Rc::new(slint::VecModel::default()),
+        selected_cities_model: Rc::new(slint::VecModel::default()),
+        timer: Timer::default(),
     }));
 
     app_state.borrow_mut().initialize();
 
     let data_adapter = app_window.global::<DataAdapter>();
-    data_adapter.set_available_cities_model(app_state.borrow().available_cities_model.clone().into());
+    data_adapter
+        .set_available_cities_model(app_state.borrow().available_cities_model.clone().into());
+    data_adapter.set_selected_cities_model(app_state.borrow().selected_cities_model.clone().into());
+
+    let state_copy = app_state.clone();
+    let app_window_weak = app_window.as_weak(); //.clone_strong();
+    state_copy.borrow().timer.start(
+        TimerMode::Repeated,
+        std::time::Duration::from_millis(250),
+        move || {
+            if let Some(window) = app_window_weak.upgrade() {
+                let data_adapter = window.global::<DataAdapter>();
+                let use_12h_format = data_adapter.get_use_12h_format();
+                let utc_now = Utc::now();
+                for (index, mut info) in app_state.borrow().selected_cities_model.iter().enumerate()
+                {
+                    if let Ok(tz) = Tz::from_str(&info.timezone) {
+                        let zone_time = utc_now.with_timezone(&tz);
+                        info.timenow = zone_time
+                            .format(if use_12h_format {
+                                "%I:%M %p"
+                            } else {
+                                "%H:%M"
+                            })
+                            .to_string()
+                            .into();
+                        app_state
+                            .borrow()
+                            .selected_cities_model
+                            .set_row_data(index, info);
+                    } else {
+                        println!("Invalid timezone string: {}", info.timezone);
+                    }
+                }
+            }
+        },
+    );
+
+    let selected_cities_model_clone = state_copy.borrow().selected_cities_model.clone();
+    let available_cities_model_clone = state_copy.borrow().available_cities_model.clone();
+    data_adapter.on_add_city(move |idx| {
+        let val = available_cities_model_clone.row_data(idx as usize).unwrap();
+        selected_cities_model_clone.push(val);
+    });
 
     // _ to keep the timer alive
     let _timer = update(&app_window);

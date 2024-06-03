@@ -12,4 +12,7 @@ export global DataAdapter {
     in property <string> date_time: "";
     in-out property <bool> use_12h_format: false;
     in property <[TimeZoneInfo]> available_cities_model: [];
+    in property <[TimeZoneInfo]> selected_cities_model: [];
+
+    callback add_city(int);
 }
