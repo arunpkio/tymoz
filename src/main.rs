@@ -1,6 +1,6 @@
-slint::include_modules!();
+
 mod time_zones;
-use chrono::{Local, Offset, Utc};
+use chrono::{Local, Offset, TimeZone, Utc};
 use chrono_tz::Tz;
 use directories::ProjectDirs;
 use serde_json;
@@ -14,6 +14,9 @@ use std::path::PathBuf;
 use std::rc::Rc;
 use std::str::FromStr;
 use time_zones::TIME_ZONES;
+use wasm_bindgen::prelude::*;
+
+slint::include_modules!();
 
 pub const CACHE_FILE_NAME: &str = "cache.json";
 fn get_app_dir() -> PathBuf {
@@ -65,24 +68,42 @@ impl AppState {
         let utc_date = utc_now.format("%d, %B").to_string();
         let utc_zone_info = &TIME_ZONES[0]; // By default, show UTC time
 
-        let app_dir = get_app_dir();
-        let settings_file = app_dir.join(CACHE_FILE_NAME);
-        if settings_file.exists() {
-            let file = File::open(settings_file).expect("Unable to open file");
-            let reader = BufReader::new(file);
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            let app_dir = get_app_dir();
+            let settings_file = app_dir.join(CACHE_FILE_NAME);
+            if settings_file.exists() {
+                let file = File::open(settings_file).expect("Unable to open file");
+                let reader = BufReader::new(file);
 
-            for line in reader.lines() {
-                let line = line.expect("Unable to read line");
-                let info: TimeZoneInfo = serde_json::from_str(&line).expect("Unable to parse JSON");
-                self.selected_cities_model.push(info);
+                for line in reader.lines() {
+                    let line = line.expect("Unable to read line");
+                    let info: TimeZoneInfo = serde_json::from_str(&line).expect("Unable to parse JSON");
+                    self.selected_cities_model.push(info);
+                }
+            } else {
+                self.selected_cities_model.insert(
+                    0,
+                    TimeZoneInfo {
+                        city: utc_zone_info.name.into(),
+                        timenow: local_time_str.into(),
+                        offset: format_time_diff(local_offset).into(),
+                        date: utc_date.into(),
+                        is_ahead: local_offset >= 0.0,
+                        timezone: utc_zone_info.location.into(),
+                    },
+                );
             }
-        } else {
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
             self.selected_cities_model.insert(
                 0,
                 TimeZoneInfo {
                     city: utc_zone_info.name.into(),
                     timenow: local_time_str.into(),
-                    offset: format_time_diff(local_offset).into(),
+                    offset: crate::format_time_diff(local_offset).into(),
                     date: utc_date.into(),
                     is_ahead: local_offset >= 0.0,
                     timezone: utc_zone_info.location.into(),
@@ -119,7 +140,8 @@ pub fn update(window: &AppWindow) -> Timer {
     update_timer
 }
 
-fn main() -> Result<(), slint::PlatformError> {
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
+fn main() {
     let app_window = AppWindow::new().unwrap();
 
     let app_state = Rc::new(RefCell::new(AppState {
@@ -191,5 +213,5 @@ fn main() -> Result<(), slint::PlatformError> {
         CloseRequestResponse::HideWindow
     });
 
-    app_window.run()
+    app_window.run().unwrap()
 }

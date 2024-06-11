@@ -5,14 +5,16 @@ import { Header } from "header.slint";
 import { TimeZoneInfo, DataAdapter } from "data_adapter.slint";
 import { CityListPopup } from "city_list_popup.slint";
 
+import { Button, VerticalBox } from "std-widgets.slint";
+
 export { DataAdapter }
 
 export component AppWindow inherits Window {
     title: "tymoz";
-    preferred-width: 1200px;
-    preferred-height: 800px;
-    min-width: 620px;
-    min-height: 720px;
+    preferred-width: 1020px;
+    preferred-height: 680px;
+    min-width: 520px;
+    min-height: 680px;
     background: Theme.appBackgroundColor;
 
     VerticalLayout {
