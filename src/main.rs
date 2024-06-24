@@ -1,6 +1,5 @@
-
 mod time_zones;
-use chrono::{Local, Offset, TimeZone, Utc};
+use chrono::{Local, Offset, Utc};
 use chrono_tz::Tz;
 use directories::ProjectDirs;
 use serde_json;
@@ -14,6 +13,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 use std::str::FromStr;
 use time_zones::TIME_ZONES;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 slint::include_modules!();
@@ -78,7 +78,8 @@ impl AppState {
 
                 for line in reader.lines() {
                     let line = line.expect("Unable to read line");
-                    let info: TimeZoneInfo = serde_json::from_str(&line).expect("Unable to parse JSON");
+                    let info: TimeZoneInfo =
+                        serde_json::from_str(&line).expect("Unable to parse JSON");
                     self.selected_cities_model.push(info);
                 }
             } else {
@@ -202,7 +203,7 @@ fn main() {
     app_window.window().on_close_requested(move || {
         let app_dir = get_app_dir();
         let cache_file = app_dir.join(CACHE_FILE_NAME);
-        let file = File::create(&cache_file).unwrap();
+        let file = File::create(cache_file).unwrap();
         let mut binding = BufWriter::new(&file);
         let writer: &mut &File = binding.get_mut();
         for info in selected_cities_model_clone2.iter() {
