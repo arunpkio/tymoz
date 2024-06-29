@@ -78,9 +78,17 @@ impl AppState {
 
                 for line in reader.lines() {
                     let line = line.expect("Unable to read line");
-                    let info: TimeZoneInfo =
+                    let mut info: TimeZoneInfo =
                         serde_json::from_str(&line).expect("Unable to parse JSON");
-                    self.selected_cities_model.push(info);
+                    if let Ok(tz) = Tz::from_str(&info.timezone) {
+                        let zone_time = utc_now.with_timezone(&tz);
+                        info.timenow = zone_time
+                            .format(if true { "%I:%M %p" } else { "%H:%M" })
+                            .to_string()
+                            .into();
+                        info.date = zone_time.format("%d, %B").to_string().into();
+                        self.selected_cities_model.push(info);
+                    }
                 }
             } else {
                 self.selected_cities_model.insert(
@@ -176,6 +184,7 @@ fn main() {
                             .format(if use_12h_format { "%I:%M %p" } else { "%H:%M" })
                             .to_string()
                             .into();
+                        info.date = zone_time.format("%d, %B").to_string().into();
                         app_state
                             .borrow()
                             .selected_cities_model
