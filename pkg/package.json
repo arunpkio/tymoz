@@ -1,0 +1,17 @@
+{
+  "name": "tymoz",
+  "collaborators": [
+    "Arun PK"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "tymoz_bg.wasm",
+    "tymoz.js",
+    "tymoz.d.ts"
+  ],
+  "module": "tymoz.js",
+  "types": "tymoz.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
