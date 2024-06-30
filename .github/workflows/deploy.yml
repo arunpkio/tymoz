@@ -4,6 +4,7 @@ on:
     branches: [main]
     workflows: [Continuous integration]
     types: [completed]
+    # test
 
 jobs:
   release:
